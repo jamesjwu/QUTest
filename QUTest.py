@@ -79,7 +79,7 @@ Creates a suite of large integer input tests.
 """
 def largeIntTests(fn, maximum = 1000000000000, factor = 10): 
 	i = 1
-	suite = Suite("Large Integer tests")
+	suite = Suite("{0} Large Integer tests".format(fn.__name__))
 	while i < maximum:
 		suite.addTest(Test(fn, [i], name = "{0}({1})".format(fn.__name__, i)))
 		i *= 10
@@ -116,16 +116,17 @@ class Suite(object):
 		for test in self.tests:
 			print "Running", test.name
 			print "Input: ", test.inputs
-
-			print "Expect:", test.output
+			if test.output is not Unknown:
+				print "Expect:", test.output
 
 			result = test.run()
 			if result[0]:
 				passed += 1
 
-				print "test successful"
 				if result[1] == 4:
 					print "Output:", result[2]
+
+				print "TEST PASSED"
 				print "--------------------------"
 
 			else:

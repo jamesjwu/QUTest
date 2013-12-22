@@ -4,9 +4,9 @@ def foo():
 	assert False
 	return 0
 
-def f(x):
+def mathFunc(x):
 	if x == 0: return 1
-	return f(x/2) + 10
+	return mathFunc(x/2) + 10
 
 test = Test(foo,[], output = 0, error = True,)
 test2 = Test(test.run, [], (True, 0, None), name = "Test.run()")
@@ -24,7 +24,7 @@ s.addTest(test4)
 
 test5 = Test(s.runTests, [], 0, error = False, name = "running tests")
 
-t = largeIntTests(f)
+t = largeIntTests(mathFunc)
 
 
 t.runTests()
