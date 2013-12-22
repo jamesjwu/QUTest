@@ -1,7 +1,9 @@
 """
 QUTest- Unit Tests made easy
 """
-
+#used for when the output is unknown
+class Unknown(object):
+	pass
 
 
 """Runs a single test"""
@@ -15,7 +17,7 @@ class Test(object):
 	#do we expect an assertion error?
 	error = False
 
-	def __init__(self, fn, inputs = [], output = None, error = False, name = ""):
+	def __init__(self, fn, inputs = [], output = Unknown, error = False, name = ""):
 		"""
 		fn: function in question
 		inputs: required inputs for the function
@@ -23,7 +25,10 @@ class Test(object):
 		error: whether or not this function should trigger an error
 		name: name of function
 		"""
+
 		self.name = name
+		if not self.name:
+			self.name = fn.__name__
 		self.inputs = inputs
 		self.error = error
 		if error:
@@ -43,6 +48,7 @@ class Test(object):
 		1: Unexpected AssertionError
 		2: Expected AssertionError, code ran to completion
 		3: Incorrect Output
+		4: Unknown output, prints out
 		"""
 		
 		try:
@@ -57,12 +63,28 @@ class Test(object):
 		if self.error:
 			return (False, 2, testOutput)
 
+		if self.output is Unknown:
+			return (True, 4, testOutput)
+
 		if testOutput == self.output:
 			return (True, 0, None)
 
 		else:
 			return (False, 3, testOutput)
 
+
+"""
+Creates a suite of large integer input tests.
+
+"""
+def largeIntTests(fn, maximum = 1000000000000, factor = 10): 
+	i = 1
+	suite = Suite("Large Integer tests")
+	while i < maximum:
+		suite.addTest(Test(fn, [i], name = "{0}({1})".format(fn.__name__, i)))
+		i *= 10
+
+	return suite
 
 
 class Suite(object):
@@ -74,10 +96,15 @@ class Suite(object):
 		self.tests = tests
 		self.name = name
 
+
+
 	def addTest(self, test):
 		assert type(test) == Test
 		self.tests.append(test)
-		
+	
+
+	def removeTest(self, test):
+		self.tests.remove(test)
 
 
 	def runTests(self):
@@ -95,7 +122,10 @@ class Suite(object):
 			result = test.run()
 			if result[0]:
 				passed += 1
+
 				print "test successful"
+				if result[1] == 4:
+					print "Output:", result[2]
 				print "--------------------------"
 
 			else:
@@ -123,7 +153,7 @@ class Suite(object):
 		print "Tests failed: ", errorCount
 
 
-		return errorCount
+	
 
 
 
