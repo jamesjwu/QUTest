@@ -1,6 +1,8 @@
 """
 QUTest- Unit Tests made easy
 """
+import time
+
 #used for when the output is unknown
 class Unknown(object):
 	pass
@@ -37,7 +39,12 @@ class Test(object):
 			self.output = output
 		self.fn = fn
 
-	
+	def time(self):
+		start = time.clock()
+		result = self.run()
+		elapsed = time.clock() - start
+		return (result, elapsed)
+
 	def run(self):
 		"""
 		Returns a triplet, of type
@@ -78,11 +85,15 @@ Creates a suite of large integer input tests.
 
 """
 def largeIntTests(fn, maximum = 1000000000000, factor = 10): 
+
 	i = 1
 	suite = Suite("{0} Large Integer tests".format(fn.__name__))
 	while i < maximum:
 		suite.addTest(Test(fn, [i], name = "{0}({1})".format(fn.__name__, i)))
-		i *= 10
+		if(factor == 1):
+			i += 1
+		else:
+			i *= factor
 
 	return suite
 
@@ -107,7 +118,45 @@ class Suite(object):
 		self.tests.remove(test)
 
 
-	def runTests(self):
+	def timeTests(self):
+		self.runTests(timed = True)
+
+	def runTestsSilent(self):
+		"""
+		Runs tests quietly, unless an error occurs
+		"""
+		errorCount = 0
+		passed = 0
+
+		for test in self.tests:
+			result = test.run()
+			if result[0]:
+				passed += 1
+			else:
+				errorCount += 1
+				#otherwise there's an error
+				print "TEST FAILED"
+				print "Expected ", test.output
+
+				#assertion error
+				if result[1] == 1:
+					print "An assertion error occurred unexpectedly:"
+					print result[2]
+
+				#expected an assertion error	
+				elif result[1] == 2:
+					print "Expected an assertion to fail, but ran to completion"
+					print "Output: ", result[2]
+
+				else:
+					assert result[1] == 3
+					print "Incorrect output:", result[2]
+
+				print "--------------------------"
+		print "Tests passed: ", passed
+		print "Tests failed: ", errorCount
+
+	def runTests(self, timed= False):
 		print "Running unit tests on suite", self.name
 		print "--------------------------"
 		errorCount = 0
@@ -119,7 +168,10 @@ class Suite(object):
 			if test.output is not Unknown:
 				print "Expect:", test.output
 
-			result = test.run()
+			if timed:
+				result, elapsed = test.time()
+			else:
+				result = test.run()
 			if result[0]:
 				passed += 1
 
@@ -127,6 +179,9 @@ class Suite(object):
 					print "Output:", result[2]
 
 				print "TEST PASSED"
+
+				if timed:
+					print "Time Elapsed:", elapsed
 				print "--------------------------"
 
 			else:
