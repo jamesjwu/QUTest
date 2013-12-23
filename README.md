@@ -18,7 +18,7 @@ Creating Tests
 --------------
 A Test object is very simple to make:
 
-```
+```python
 def __init__(self, fn, inputs = [], output = Unknown, error = False, name = ""):
 		"""
 		fn: function in question
@@ -32,7 +32,7 @@ If you do not specify an output, QUTest will assume the output is unknown(creati
 
 
 An example usage would be:
-```
+```python
 def foo(x):
 	pass
 
@@ -43,7 +43,7 @@ mytest = Test(foo, [], output = None, error = False, name = "")
 Running individual tests
 ------------------------
 To run any individual test, simply call test.run(). The return value will be a tuple, with information as follows:
-```
+```python
 def run(self):
 		"""
 		Returns a triplet, of type
@@ -58,12 +58,12 @@ def run(self):
 		"""
 ```
 For example, running a test on a function that returns the correct output will return:
-```
+```python
 >>> workingfunctiontest.run()
 (True, 0, None)
 ```
 And running a test with an unknown output will return:
-```
+```python
 >>> workingfunctiontest.run()
 (True, 4, testOutput)
 ```
@@ -130,7 +130,7 @@ factor: Ratio of input sizes. If set to 1, inputs will increment by 1 each time
 ```
 Running largeIntTests to time an unmemoized fibonacci function, for example:
 
-```
+```python
 def fib(x):
 	if x == 0: return 1
 	if x == 1: return 1
