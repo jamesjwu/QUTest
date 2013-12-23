@@ -30,7 +30,9 @@ s.addTest(test4)
 
 test5 = Test(s.runTests, [], 0, error = False, name = "running tests")
 
-t = largeIntTests(fib, maximum = 20, factor = 1)
+s.runTests()
+
+t = largeIntTests(fib, maximum = 5, factor = 1)
 
 
 t.timeTests()

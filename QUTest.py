@@ -80,15 +80,16 @@ class Test(object):
 			return (False, 3, testOutput)
 
 
-"""
-Creates a suite of large integer input tests.
 
-"""
 def largeIntTests(fn, maximum = 1000000000000, factor = 10): 
-
+	"""
+	Creates a suite of large integer input tests.
+	Maximum: Maximum size input
+	factor: Ratio of input sizes. If set to 1, inputs will increment by 1 each time
+	"""
 	i = 1
 	suite = Suite("{0} Large Integer tests".format(fn.__name__))
-	while i < maximum:
+	while i <= maximum:
 		suite.addTest(Test(fn, [i], name = "{0}({1})".format(fn.__name__, i)))
 		if(factor == 1):
 			i += 1
