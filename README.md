@@ -2,6 +2,7 @@ QUTest
 ======
 
 A Simple Python Unit Testing Tool by James Wu
+Version 0.1
 
 Why QUTest?
 -----------
@@ -120,7 +121,7 @@ Other features
 ###Timing tests
 Running Suite.timeTests() instead of runTests() will do performance testing, allowing you to see the time elapsed on your functions.
 
-###Largeinttests
+###Large Integer Tests
 LargeIntTests is a simple method that creates a suite of tests that tests a function on larger and larger inputs.
 ```python
 def largeIntTests(fn, maximum = 1000000000000, factor = 10): 
@@ -181,3 +182,12 @@ Tests passed:  5
 Tests failed:  0
 [Finished in 0.1s]
 ```
+Still in Progress
+------------------
+
+This module is still in development! I'm in the process of adding some of these features:
+
+* Time complexity analyzer- takes time information to return an estimate of time complexity of a function
+* Multitests - Running tests multiple times to check for consistency
+* More robust suite test features - Things like concurrency tests, data structure invariants, etc should be handled sometime in the near future.
+
