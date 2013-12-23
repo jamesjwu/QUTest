@@ -187,14 +187,15 @@ Tests failed:  0
 Estimating Time Complexities 
 ----------------------------
 QUTest can benchmark the big O time complexities of simple functions. For now, this means only functions with single integer inputs, but work is being done to facilitate list and other inputs. To run it, simply call
-```
+```python
 def calcTimeComplexity(fn, maximum = 10000000000, factor = 10):
 	"""
 	Generates a list of largeIntTests, and uses them to figure out time complexity by timing
 	
 	Currently only works on functions with one argument, which is an int or float
 
-	NOT EXACT: Only estimates based on linear, quadratic, cubic, exponential and logarithmic regression data
+	Maximum and factor are the same as arguments for largeIntTests
+
 	"""
 ```
 
