@@ -7,7 +7,9 @@ Why QUTest?
 -----------
 I created QUTest as a practice project, in order to better understand unit testing and writing modules. QUTest also serves the purpose to the average python beginner as a very simple method of creating tests for code. The syntax of QUTest is simple to use, and may be a very simple alternative to the unittest module or pytest, if one is looking for an easy to use solution. Be aware that, at the cost of simplicity, the features in QUTest are much more limited than their professionally made counterparts.
 
-
+What does QUTest stand for?
+--------------------------
+Despite sounding like "cutest", it actually is supposed to stand for "Quality Unit Tests". I'm not really picky either way.
 
 Installation
 ------------
