@@ -13,7 +13,7 @@ Despite sounding like "cutest", it actually is supposed to stand for "Quality Un
 
 Installation
 ------------
-Simply download or clone QUTest.py, and then importing QUTest. Change and run at your own will and risk(see license for more information). 
+Simply download or clone QUTest.py, and then import QUTest. Change and run at your own will and risk(see license for more information). 
 
 
 Creating Tests
