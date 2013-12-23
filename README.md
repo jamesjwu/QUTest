@@ -120,7 +120,7 @@ Running Suite.timeTests() instead of runTests() will do performance testing, all
 
 ###Largeinttests
 LargeIntTests is a simple method that creates a suite of tests that tests a function on larger and larger inputs.
-```
+```python
 def largeIntTests(fn, maximum = 1000000000000, factor = 10): 
 """
 Creates a suite of large integer input tests.
