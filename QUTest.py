@@ -1,7 +1,7 @@
 """
 QUTest- Unit Tests made easy
 """
-import time, numpy, math
+import time, numpy, math, gc
 from scipy.stats import linregress
 
 #used for when the output is unknown
@@ -47,6 +47,11 @@ class Test(object):
 		elapsed = time.clock() - start
 		return (result, elapsed)
 
+	def onlytime(self):
+		start = time.clock()
+		self.fn(*self.inputs)
+		elapsed = time.clock() - start
+		return elapsed
 
 	def avgtime(self, tries):
 		"""
@@ -54,10 +59,11 @@ class Test(object):
 		"""
 		total = 0
 		for i in xrange(tries):
-			_, elapsed = self.time()
+			elapsed = self.onlytime()
 			total += elapsed
 
 		return total / tries
+
 
 
 
@@ -103,7 +109,7 @@ class Test(object):
 
 
 
-def largeIntTests(fn, maximum = 1000000000000, factor = 10, start = 1000): 
+def largeIntTests(fn, maximum = 1000000000000, factor = 10, start = 1): 
 	"""
 	Creates a suite of large integer input tests.
 	Maximum: Maximum size input
@@ -121,13 +127,13 @@ def largeIntTests(fn, maximum = 1000000000000, factor = 10, start = 1000):
 	return suite
 
 ##from stackoverflow
-def keywithminval(d):
+def keywithmaxval(d):
      """ a) create a list of the dict's keys and values; 
          b) return the key with the max value"""  
      v=list(d.values())
      k=list(d.keys())
 
-     return k[v.index(min(v))]
+     return k[v.index(max(v))]
 
 
 def calcTimeComplexity(fn, maximum = 10000000000, factor = 10):
@@ -138,63 +144,59 @@ def calcTimeComplexity(fn, maximum = 10000000000, factor = 10):
 
 	NOT EXACT: Only estimates based on linear, quadratic, cubic, exponential and logarithmic regression data
 	"""
-	testSuite = largeIntTests(fn, maximum, factor)
-	inputs = []
-	times = []
+	testSuite = largeIntTests(fn, maximum, factor, start = 1)
+	data = []
 	#run average time elapsed on each test
 	for test in testSuite.tests:
+		gc.collect()
 		assert len(test.inputs) == 1
 
 		inputSize = test.inputs[0]
-		inputs.append(inputSize)
+
 		#number of times we average it by
-		testTime = test.avgtime(100)
-		times.append(testTime)
+
+		testTime = test.avgtime(100) * 10000
+
 		print inputSize, ":", testTime
 
+		data.append((inputSize, testTime))
 
-		assert len(inputs) == len(times)
+
+	del testSuite.tests[:]
+	rvals = {}
+	
+	#linear?
+	slope, _, lin_rval, _, _ = linregress(data)
+
+	rvals['n'] = lin_rval**2
+
+
+	#quadratic?
+	sq_data = [(x, math.sqrt(y)) for (x,y) in data]
+	_, _, sq_rval, _, _ = linregress(sq_data)
+	rvals['n^2'] = sq_rval**2
+	del sq_data[:]
+
+	#nlogn?
+	nlgn_data = [(x*math.log(x,2), y) for (x,y) in data]
+	_, _, nlgn_rval, _, _ = linregress(nlgn_data)
+	rvals['nlg(n)'] = nlgn_rval**2
+	del nlgn_data[:]
 
 	
-	#Now we have our data. Let's calculate regressions
+	#exp?
+	exp_data = [(x, math.log(y, 2)) for (x,y) in data]
+	_, _, exp_rval, _, _ = linregress(exp_data)	
+	rvals['2^n'] = exp_rval**2
+	del exp_data[:]
 
-	##For Polynomial times
-	stderrs = {}
+	#log?
+	log_data = [(math.log(x, 2), y) for (x,y) in data]
+	_, _, log_rval, _, _ = linregress(log_data)	
+	rvals['lg(n)'] = log_rval**2
 
-
-
-
-	##linear
-	#y = x
+	return "O(" + keywithmaxval(rvals) + ")"
 	
-	slope, _, _, _, lin_stderr = linregress(inputs, times)
-	
-	if slope < .0000001:
-		stderrs['constant'] = lin_stderr
-	else:
-		stderrs['lin'] = lin_stderr
-
-	##squared
-	#x = sqrt(y)
-	sqrt_times = [math.sqrt(i) for i in times]
-	_, _, _, _, sq_stderr = linregress(inputs, sqrt_times)
-	stderrs['x^2'] = sq_stderr
-
-	##logarithmic
-	#y = log(x)
-	log_inputs = [math.log(i, 2) for i in inputs]
-	_, _, _, _, log_stderr = linregress(log_inputs, times)
-	stderrs['log'] = log_stderr
-
-	##exponential
-	#log (y) = x
-	log_times = [math.log(i, 2) for i in times]
-	_, _, _, _, exp_stderr = linregress(inputs, log_times)
-	stderrs['exp'] = exp_stderr
-
-	print stderrs
-
-	return keywithminval(stderrs)
 
 
 
