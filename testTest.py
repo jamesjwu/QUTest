@@ -88,4 +88,4 @@ test5 = Test(s.runTests, [], 0, error = False, name = "running tests")
 
 
 """
-print calcTimeComplexity(testbinSearch, maximum = 1000, factor = 2)
+print calcTimeComplexity(testmerge, maximum = 100, factor = 2)

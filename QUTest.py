@@ -157,8 +157,6 @@ def calcTimeComplexity(fn, maximum = 10000000000, factor = 10):
 
 		testTime = test.avgtime(100) * 10000
 
-		print inputSize, ":", testTime
-
 		data.append((inputSize, testTime))
 
 

@@ -2,7 +2,8 @@ QUTest
 ======
 
 A Simple Python Unit Testing Tool by James Wu
-Version 0.1
+
+Version 1.0
 
 Why QUTest?
 -----------
@@ -182,12 +183,55 @@ Tests passed:  5
 Tests failed:  0
 [Finished in 0.1s]
 ```
+
+Estimating Time Complexities 
+----------------------------
+QUTest can benchmark the big O time complexities of simple functions. For now, this means only functions with single integer inputs, but work is being done to facilitate list and other inputs. To run it, simply call
+```
+def calcTimeComplexity(fn, maximum = 10000000000, factor = 10):
+	"""
+	Generates a list of largeIntTests, and uses them to figure out time complexity by timing
+	
+	Currently only works on functions with one argument, which is an int or float
+
+	NOT EXACT: Only estimates based on linear, quadratic, cubic, exponential and logarithmic regression data
+	"""
+```
+
+For example, running calcTimeComplexity of on a simple mergesort function(which has been altered to be tested with integer inputs representing length):
+```python
+def mergesort(L):
+	if not L:
+		return []
+	if len(L) == 1:
+		return L
+
+	half = len(L)/2
+
+	return merge(mergesort(L[:half]), mergesort(L[half:]))
+
+
+def testmerge(x):
+	L = [random.uniform(0, x) for i in xrange(x)] #does not effect bigO, since is only O(n)
+	return mergesort(L)
+```
+
+yields:
+```python
+>>> print calcTimeComplexity(testmerge, maximum = 100, factor = 2)
+O(nlg(n))
+```
+
+Note that currently, the build supports O(n), O(n^2), O(nlg(n)), O(lg(n)) and O(2^n) as estimates. A more robust format for calculating any time efficiency is in development.
+
+
+
 Still in Progress
 ------------------
 
 This module is still in development! I'm in the process of adding some of these features:
 
-* Time complexity analyzer- takes time information to return an estimate of time complexity of a function
+* Time complexity analyzer- more robust calculations
 * Multitests - Running tests multiple times to check for consistency
 * More robust suite test features - Things like concurrency tests, data structure invariants, etc should be handled sometime in the near future.
 
