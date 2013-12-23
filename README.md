@@ -1,4 +1,8 @@
 QUTest
 ======
 
-Simple Python Unit Testing Tool
+A Simple Python Unit Testing Tool by James Wu
+
+
+Documentation:
+
