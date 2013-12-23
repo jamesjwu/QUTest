@@ -9,10 +9,12 @@ def foo():
 	return 0
 
 def fib(x):
-	if x == 0: return 1
-	if x == 1: return 1
+	y = 0
+	for i in xrange(x**2):
+		y += 1
+	return y
 
-	return fib(x-1) + fib(x-2) 
+
 
 test = Test(foo,[], output = 0, error = True,)
 test2 = Test(test.run, [], (True, 0, None), name = "Test.run()")
@@ -30,9 +32,6 @@ s.addTest(test4)
 
 test5 = Test(s.runTests, [], 0, error = False, name = "running tests")
 
-s.runTests()
-
-t = largeIntTests(fib, maximum = 5, factor = 1)
 
 
-t.timeTests()
+print calcTimeComplexity(fib, maximum = 10000, factor = 10)
