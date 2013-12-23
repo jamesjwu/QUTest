@@ -49,7 +49,13 @@ class Test(object):
 
 	def onlytime(self):
 		start = time.clock()
-		self.fn(*self.inputs)
+		try: 
+			self.fn(*self.inputs)
+		except Exception as e:
+			print "Exception!"
+			return False
+
+
 		elapsed = time.clock() - start
 		return elapsed
 
@@ -82,7 +88,8 @@ class Test(object):
 		
 		try:
 			testOutput = self.fn(*self.inputs)
-		except AssertionError, e:
+
+		except Exception as e:
 			if self.error:
 				return (True, 0, None)
 
@@ -144,11 +151,15 @@ def calcTimeComplexity(fn, maximum = 10000000000, factor = 10):
 
 	NOT EXACT: Only estimates based on linear, quadratic, cubic, exponential and logarithmic regression data
 	"""
+	fn(maximum)
+
 	testSuite = largeIntTests(fn, maximum, factor, start = 1)
+
+
 	data = []
 	#run average time elapsed on each test
 	for test in testSuite.tests:
-		gc.collect()
+
 		assert len(test.inputs) == 1
 
 		inputSize = test.inputs[0]
@@ -193,6 +204,7 @@ def calcTimeComplexity(fn, maximum = 10000000000, factor = 10):
 	_, _, log_rval, _, _ = linregress(log_data)	
 	rvals['lg(n)'] = log_rval**2
 
+
 	return "O(" + keywithmaxval(rvals) + ")"
 	
 
@@ -212,9 +224,22 @@ class Suite(object):
 		self.tests = tests
 		self.name = name
 
+	def __add__(self, other):
 
+		return Suite(self.name + " and " + other.name, self.tests + other.tests)
+
+
+	def __repr__(self):
+		return self.name + str(self.tests)
+
+
+	def addTests(self, tests):
+		"adds a list of tests to the suite"
+		assert type(tests) == list
+		self.tests += tests
 
 	def addTest(self, test):
+		"adds a single test to the Suite"
 		assert type(test) == Test
 		self.tests.append(test)
 	
@@ -240,7 +265,8 @@ class Suite(object):
 			else:
 				errorCount += 1
 				#otherwise there's an error
-				print "TEST FAILED"
+				print "TEST on function", test.fn.__name__, "FAILED"
+				print "Input:",  test.inputs
 				print "Expected ", test.output
 
 				#assertion error
@@ -258,8 +284,10 @@ class Suite(object):
 					print "Incorrect output:", result[2]
 
 				print "--------------------------"
-		print "Tests passed: ", passed
-		print "Tests failed: ", errorCount
+
+		if errorCount:
+			print "Tests failed: ", errorCount
+		return errorCount
 
 	def runTests(self, timed= False):
 		print "Running unit tests on suite", self.name
@@ -276,7 +304,11 @@ class Suite(object):
 			if timed:
 				result, elapsed = test.time()
 			else:
+
 				result = test.run()
+
+
+
 			if result[0]:
 				passed += 1
 
@@ -315,7 +347,7 @@ class Suite(object):
 
 
 	
-
+		return errorCount
 
 
 

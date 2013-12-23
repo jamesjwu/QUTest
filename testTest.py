@@ -59,7 +59,7 @@ def testmerge(x):
 
 	return mergesort(L)
 
-def foo():
+def foo(x):
 	assert False
 	return 0
 
@@ -68,24 +68,18 @@ def fib(x):
 	
 	return fib(x/2)
 
-"""
+fibtest = Test(calcTimeComplexity, [fib], output = "O(lg(n))")
+footest = Test(calcTimeComplexity, [foo], error = True)
 
-test = Test(foo,[], output = 0, error = True,)
-test2 = Test(test.run, [], (True, 0, None), name = "Test.run()")
+mergetest = Test(calcTimeComplexity, [testmerge, 300, 2], output = "O(nlg(n))")
+bintest = Test(calcTimeComplexity, [testbinSearch, 300, 2], output = "O(lg(n))")
 
+timecomplexitySuite = Suite("calcTimeComplexity", [fibtest,footest, mergetest, bintest])
 
-s = Suite("QUTest", [test])
-
-test3 = Test(s.addTest, [test2], error = False, name = "suite.addTest")
-
-test4 = Test(s.addTest, [5], None, error = True, name = "Improper input to suite.addTest")
-
-
-s.addTest(test3)
-s.addTest(test4) 
-
-test5 = Test(s.runTests, [], 0, error = False, name = "running tests")
+errors = 0
+for i in xrange(50):
+	errors += timecomplexitySuite.runTestsSilent()
 
 
-"""
-print calcTimeComplexity(testmerge, maximum = 100, factor = 2)
+print "TOTAL ERRORS:", errors
+
