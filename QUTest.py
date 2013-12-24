@@ -233,6 +233,9 @@ class Suite(object):
 		return self.name + str(self.tests)
 
 
+	def testList(self):
+		return self.tests
+		
 	def addTests(self, tests):
 		"adds a list of tests to the suite"
 		assert type(tests) == list

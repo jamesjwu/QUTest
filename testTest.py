@@ -1,7 +1,25 @@
 """
-Unit tests for Unit tester: 
-Uses QUTest to test QUTest
+  /$$$$$$  /$$   /$$ /$$$$$$$$                    /$$    
+ /$$__  $$| $$  | $$|__  $$__/                   | $$    
+| $$  \ $$| $$  | $$   | $$  /$$$$$$   /$$$$$$$ /$$$$$$  
+| $$  | $$| $$  | $$   | $$ /$$__  $$ /$$_____/|_  $$_/  
+| $$  | $$| $$  | $$   | $$| $$$$$$$$|  $$$$$$   | $$    
+| $$/$$ $$| $$  | $$   | $$| $$_____/ \____  $$  | $$ /$$
+|  $$$$$$/|  $$$$$$/   | $$|  $$$$$$$ /$$$$$$$/  |  $$$$/
+ \____ $$$ \______/    |__/ \_______/|_______/    \___/  
+      \__/                                               
+
+
+As a demonstration of QUTest, QUTest tests itself!
 """
+
+
+
+
+##################################
+# Helper demonstration functions #
+##################################
+
 import random
 from QUTest import *
 
@@ -68,18 +86,51 @@ def fib(x):
 	
 	return fib(x/2)
 
+
+
+
+
+
+
+#################
+#  Test Cases	#
+#################
+
+
+
+
+
+#Test the Test class
+test1 = Test(foo, [1], error = True)
+test2 = Test(mergesort, [[1,2,5,3,2]], [1,2,2,3,5], error = False, name = "mergesort test")
+test3 = Test(test1.run, [], (True, 0, None), name = "run() test" )
+test4 = Test(test2.run, [], (True, 0, None), name = "run() test 2")
+test5 = Test(test1.time, [], Unknown, name = "timetest")
+
+suite1 = Suite("test Tests", [test1, test2, test3, test4, test5])
+
+#Test the Suite class
+test5 = Test(suite1.runTestsSilent, [], 0, name = "runTestSilent() test")
+test6 = Test(suite1.runTests, [], 0, name = "runTest() test")
+test7 = Test(suite1.__add__, [suite1], Unknown, name = "Suite add test")
+test8 = Test(suite1.__repr__, [], suite1.name + str(suite1.tests), name = "Suite repr test")
+test9 = Test(suite1.testList, [], suite1.tests, name = "testList")
+suite2 = Suite("Suite tests", [test5, test6, test7, test8, test9])
+
+
+#Test calcTimeComplexity
 fibtest = Test(calcTimeComplexity, [fib], output = "O(lg(n))")
 footest = Test(calcTimeComplexity, [foo], error = True)
-
 mergetest = Test(calcTimeComplexity, [testmerge, 300, 2], output = "O(nlg(n))")
 bintest = Test(calcTimeComplexity, [testbinSearch, 300, 2], output = "O(lg(n))")
 
 timecomplexitySuite = Suite("calcTimeComplexity", [fibtest,footest, mergetest, bintest])
 
-errors = 0
-for i in xrange(50):
-	errors += timecomplexitySuite.runTestsSilent()
+fullSuite = Suite("Full Testing")
+fullSuite += suite1
+fullSuite += suite2
+fullSuite += timecomplexitySuite
 
+fullSuite.runTests()
 
-print "TOTAL ERRORS:", errors
 
