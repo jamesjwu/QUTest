@@ -1,5 +1,10 @@
 """
-QUTest- Unit Tests made easy
+QUTest Testing Module version 1.0
+(c) James Wu 2013
+
+QUTest is a simple unit testing framework for python. 
+See readme for details.
+
 """
 import time, numpy, math, gc
 from scipy.stats import linregress
@@ -235,7 +240,7 @@ class Suite(object):
 
 	def testList(self):
 		return self.tests
-		
+
 	def addTests(self, tests):
 		"adds a list of tests to the suite"
 		assert type(tests) == list

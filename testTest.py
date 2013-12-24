@@ -1,20 +1,12 @@
 """
-  /$$$$$$  /$$   /$$ /$$$$$$$$                    /$$    
- /$$__  $$| $$  | $$|__  $$__/                   | $$    
-| $$  \ $$| $$  | $$   | $$  /$$$$$$   /$$$$$$$ /$$$$$$  
-| $$  | $$| $$  | $$   | $$ /$$__  $$ /$$_____/|_  $$_/  
-| $$  | $$| $$  | $$   | $$| $$$$$$$$|  $$$$$$   | $$    
-| $$/$$ $$| $$  | $$   | $$| $$_____/ \____  $$  | $$ /$$
-|  $$$$$$/|  $$$$$$/   | $$|  $$$$$$$ /$$$$$$$/  |  $$$$/
- \____ $$$ \______/    |__/ \_______/|_______/    \___/  
-      \__/                                               
+QUTest Testing Module version 1.0
+(c) James Wu 2013
 
+QUTest is a simple unit testing framework for python. 
+This is the set of unit tests for the module.
 
 As a demonstration of QUTest, QUTest tests itself!
 """
-
-
-
 
 ##################################
 # Helper demonstration functions #
