@@ -49,7 +49,6 @@ for x in xrange(1000):
 	L[x] = [random.uniform(0, x) for i in xrange(x)]
 
 def testbinSearch(x):
-	
 	return binSearch(L[x], x/2)
 
 
@@ -65,20 +64,19 @@ def mergesort(L):
 
 
 def testmerge(x):
-	L = [random.uniform(0, x) for i in xrange(x)]
-
-	return mergesort(L)
+	return mergesort([random.uniform(0,x) for i in xrange(x)])
 
 def foo(x):
 	assert False
+	return 0
+
+def foo2(x):
 	return 0
 
 def fib(x):
 	if x == 0: return 0
 	
 	return fib(x/2)
-
-
 
 
 
@@ -118,11 +116,22 @@ bintest = Test(calcTimeComplexity, [testbinSearch, 300, 2], output = "O(lg(n))")
 
 timecomplexitySuite = Suite("calcTimeComplexity", [fibtest,footest, mergetest, bintest])
 
+
+
+#genTests test
+test10 = Test(genTests, [foo2, [1],10, None], error = False, name = "foo2 generate testss")
+test11 = Test(genTests, [mergesort,  [[1.0,4,5,4,3]], 15, sorted])
+
+
+genTests(mergesort, [[1.0, 4,5,4,3]], 15, sorted)
+
 fullSuite = Suite("Full Testing")
 fullSuite += suite1
 fullSuite += suite2
 fullSuite += timecomplexitySuite
 
-fullSuite.runTests()
+fullSuite.addTest(test10)
+fullSuite.addTest(test11)
 
+fullSuite.runTests()
 

@@ -6,13 +6,15 @@ QUTest is a simple unit testing framework for python.
 See readme for details.
 
 """
-import time, numpy, math, gc
+import time, numpy, math, gc, string, random
 from scipy.stats import linregress
+import itertools
+from inspect import getargspec
 
 #used for when the output is unknown
 class Unknown(object):
 	pass
-
+	
 
 """Runs a single test"""
 class Test(object):
@@ -45,7 +47,8 @@ class Test(object):
 			self.output = output
 		self.fn = fn
 
-
+	def __repr__(self):
+		return self.name
 	def time(self):
 		start = time.clock()
 		result = self.run()
@@ -121,7 +124,7 @@ class Test(object):
 
 
 
-def largeIntTests(fn, maximum = 1000000000000, factor = 10, start = 1): 
+def largeIntTests(fn, maximum = 10000, factor = 2, start = 1): 
 	"""
 	Creates a suite of large integer input tests.
 	Maximum: Maximum size input
@@ -129,6 +132,7 @@ def largeIntTests(fn, maximum = 1000000000000, factor = 10, start = 1):
 	"""
 	i = start
 	suite = Suite("{0} Large Integer tests".format(fn.__name__))
+
 	while i <= maximum:
 		suite.addTest(Test(fn, [i], name = "{0}({1})".format(fn.__name__, i)))
 		if(factor == 1):
@@ -147,8 +151,34 @@ def keywithmaxval(d):
 
      return k[v.index(max(v))]
 
+def getTimeData(fn, maximum, factor):
+	"""
+	times a function on various size inputs and returns timing data
+	"""
+	timeSuite = largeIntTests(fn, maximum, factor)
 
-def calcTimeComplexity(fn, maximum = 10000000000, factor = 10):
+	data = []
+
+	#run average time elapsed on each test
+	print timeSuite.tests
+	for test in timeSuite.tests:
+
+		assert len(test.inputs) == 1
+
+		inputSize = test.inputs[0]
+		
+
+		#number of times we average it by
+
+		testTime = test.avgtime(100) * 10000
+
+
+		data += [(inputSize, testTime)]
+
+
+	return data
+
+def calcTimeComplexity(fn, maximum = 10000, factor = 2):
 	"""
 	Generates a list of largeIntTests, and uses them to figure out time complexity by timing
 	
@@ -158,29 +188,17 @@ def calcTimeComplexity(fn, maximum = 10000000000, factor = 10):
 	"""
 	fn(maximum)
 
-	testSuite = largeIntTests(fn, maximum, factor, start = 1)
+	data = getTimeData(fn, maximum, factor)
 
+	print data[0]
 
-	data = []
-	#run average time elapsed on each test
-	for test in testSuite.tests:
-
-		assert len(test.inputs) == 1
-
-		inputSize = test.inputs[0]
-
-		#number of times we average it by
-
-		testTime = test.avgtime(100) * 10000
-
-		data.append((inputSize, testTime))
-
-
-	del testSuite.tests[:]
 	rvals = {}
 	
 	#linear?
+	#print data
 	slope, _, lin_rval, _, _ = linregress(data)
+
+
 
 	rvals['n'] = lin_rval**2
 
@@ -192,12 +210,11 @@ def calcTimeComplexity(fn, maximum = 10000000000, factor = 10):
 	del sq_data[:]
 
 	#nlogn?
-	nlgn_data = [(x*math.log(x,2), y) for (x,y) in data]
+	nlgn_data = [(x* math.log(x,2),y) for (x,y) in data]
 	_, _, nlgn_rval, _, _ = linregress(nlgn_data)
 	rvals['nlg(n)'] = nlgn_rval**2
 	del nlgn_data[:]
 
-	
 	#exp?
 	exp_data = [(x, math.log(y, 2)) for (x,y) in data]
 	_, _, exp_rval, _, _ = linregress(exp_data)	
@@ -213,11 +230,92 @@ def calcTimeComplexity(fn, maximum = 10000000000, factor = 10):
 	return "O(" + keywithmaxval(rvals) + ")"
 	
 
+def randString():
+	"""
+	Generates a random string of random length
+	"""
+	return ''.join(random.choice(string.ascii_uppercase + string.digits) 
+					for x in range(random.randint(0,100)))
 
 
 
+def genTests(fn, sampleInput, numTests = 20, reference = None):
+	"""
+	Generates automatic test cases for a function, with a sample input of the function
+
+	Sample input: lists of the input must be nonempty. otherwise, the function can't tell what type of list it is!
+	genTests(foo, [int], 20, None)
+
+	Reference is the reference solution- if one exists, in function form
+	"""
+
+	argNames = getargspec(fn).args
+	argTypes = []
+	for argument in sampleInput:
+		if type(argument) == list or type(argument) == tuple:
+				argTypes.append((type(argument), type(argument[0])))
+		else:
+			argTypes.append(type(argument))
 
 
+	#they must be of equal length for this to work
+	assert len(argNames) == len(argTypes)
+	argDict = dict(zip(argNames, argTypes))
+
+	possibleArgs = {}
+
+	for arg in argDict:
+		possibleArgs[arg] = [sampleInput[argNames.index(arg)]]
+		#if the argument is an integer, we test zeroes, large inputs
+		if argDict[arg] == int:
+
+			possibleArgs[arg].append(0)
+			#test random integers
+			for i in xrange(10):
+				possibleArgs[arg].append(random.randint(0,100))
+
+		elif argDict[arg] == str:
+			#test empty string
+			possibleArgs[arg].append("") 
+			#test random strings of random lengths
+			for i in xrange(10):
+				#random string generation
+				possibleArgs[arg].append(randString())
+
+		elif argDict[arg] == (list, int):
+			#test empty list
+			possibleArgs[arg].append([])
+			for i in xrange(10):
+				possibleArgs[arg].append([random.randint(0,100) for t in xrange(random.randint(1,100))])
+
+		elif argDict[arg] == (list, str):
+			possibleArgs[arg].append([])
+			for i in xrange(10):
+				#random string generation put into lists
+				possibleArgs[arg].append([randString() for y in xrange(random.randint(0,100))])
+
+		elif argDict[arg] == (list, float):
+			possibleArgs[arg].append([])
+			for i in xrange(10):
+				possibleArgs[arg].append([random.uniform(0, 100) for x in xrange(random.randint(1,100))])
+
+	
+				
+	#now we have a dictionary of possible inputs, we choose random possible inputs for each test
+	resultSuite = Suite(fn.__name__)
+	for i in xrange(numTests):
+		listofArgs = []
+		for arg in argDict:
+			listofArgs.append(random.choice(possibleArgs[arg]))
+		if reference:
+			newTest = Test(fn, listofArgs, output = reference(*listofArgs), 
+				error = False, name = "Generated test on {0}".format(fn.__name__))
+		else:
+			newTest = Test(fn, listofArgs, Unknown, error = False, 
+				name = "Generated test on {0}".format(fn.__name__))
+		resultSuite.addTest(newTest)
+	
+	return resultSuite
 
 
 class Suite(object):
@@ -244,6 +342,7 @@ class Suite(object):
 	def addTests(self, tests):
 		"adds a list of tests to the suite"
 		assert type(tests) == list
+		assert type(tests[0]) == Test
 		self.tests += tests
 
 	def addTest(self, test):
